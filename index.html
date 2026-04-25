@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>DPI ACROSS</title>
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(135deg,#0f0f0f,#1d1d35);
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+#openBtn{
+background:#111;
+color:#00ffcc;
+border:2px solid #00ffcc;
+padding:18px 35px;
+font-size:28px;
+border-radius:20px;
+box-shadow:0 0 25px #00ffcc;
+cursor:pointer;
+transition:0.3s;
+}
+#openBtn:hover{
+transform:scale(1.08);
+}
+
+.menu{
+display:none;
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:360px;
+background:#111827;
+border-radius:25px;
+box-shadow:0 0 35px cyan;
+overflow:hidden;
+animation:fade 0.4s;
+}
+
+@keyframes fade{
+from{opacity:0;transform:translate(-50%,-40%);}
+to{opacity:1;transform:translate(-50%,-50%);}
+}
+
+.header{
+background:linear-gradient(90deg,#00d2ff,#3a7bd5);
+padding:18px;
+text-align:center;
+font-size:28px;
+font-weight:bold;
+color:white;
+}
+
+.content{
+padding:25px;
+color:white;
+}
+
+.item{
+margin-bottom:25px;
+}
+
+label{
+font-size:20px;
+display:block;
+margin-bottom:10px;
+}
+
+input[type=range]{
+width:100%;
+}
+
+.value{
+margin-top:10px;
+font-size:18px;
+color:#00ffcc;
+}
+
+.toggle{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:20px;
+}
+
+.switch{
+width:55px;
+height:30px;
+background:#333;
+border-radius:30px;
+position:relative;
+cursor:pointer;
+}
+.switch::before{
+content:'';
+width:24px;
+height:24px;
+background:white;
+position:absolute;
+top:3px;
+left:4px;
+border-radius:50%;
+transition:.3s;
+}
+.switch.active{
+background:#00ff99;
+}
+.switch.active::before{
+left:27px;
+}
+
+.close{
+background:#ff3b30;
+border:none;
+width:100%;
+padding:15px;
+color:white;
+font-size:20px;
+cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<button id="openBtn">DPI ACROSS ⚙️</button>
+
+<div class="menu" id="menu">
+<div class="header">
+DPI ACROSS ⚙️
+</div>
+
+<div class="content">
+
+<div class="item">
+<label>DPI Power</label>
+<input type="range" min="300" max="900" value="520" id="dpi">
+<div class="value">
+DPI: <span id="dpiv">520</span>
+</div>
+</div>
+
+<div class="item">
+<label>Aim Sensitivity</label>
+<input type="range" min="1" max="100" value="75" id="aim">
+<div class="value">
+Aim: <span id="aimv">75</span>%
+</div>
+</div>
+
+<div class="toggle">
+<span>Ultra Smooth</span>
+<div class="switch" onclick="toggle(this)"></div>
+</div>
+
+<div class="toggle">
+<span>HeadLock Boost</span>
+<div class="switch" onclick="toggle(this)"></div>
+</div>
+
+</div>
+
+<button class="close" onclick="closeMenu()">
+Close
+</button>
+
+</div>
+
+<script>
+let menu=document.getElementById("menu");
+
+document.getElementById("openBtn").onclick=function(){
+menu.style.display="block";
+}
+
+function closeMenu(){
+menu.style.display="none";
+}
+
+function toggle(x){
+x.classList.toggle("active");
+}
+
+dpi.oninput=function(){
+dpiv.innerText=this.value;
+}
+
+aim.oninput=function(){
+aimv.innerText=this.value;
+}
+</script>
+
+</body>
+</html>
