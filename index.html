@@ -7,26 +7,16 @@
 <style>
 body{
 margin:0;
-background:#050510;
-display:flex;
-justify-content:center;
-align-items:flex-start;
-height:100vh;
+background:#060611;
 font-family:Arial;
-padding-top:40px;
+text-align:center;
+padding-top:70px;
 }
 
-.topbar{
-background:#111;
-padding:18px 35px;
-border-radius:30px;
-box-shadow:0 0 25px cyan;
-}
-
+/* dòng chữ duy nhất */
 #rainbowText{
-font-size:30px;
+font-size:34px;
 font-weight:bold;
-white-space:nowrap;
 animation:rainbow 4s linear infinite;
 }
 
@@ -40,16 +30,109 @@ animation:rainbow 4s linear infinite;
 85%{color:violet;}
 100%{color:red;}
 }
+
+button{
+margin-top:50px;
+background:#111827;
+color:#00ffee;
+font-size:30px;
+padding:18px 50px;
+border:none;
+border-radius:20px;
+cursor:pointer;
+}
+
+/* menu */
+.menu{
+display:none;
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:#111827;
+width:360px;
+border-radius:25px;
+padding:30px;
+color:white;
+}
+
+.menu h2{
+margin-top:0;
+}
+
+.fileBtn{
+display:inline-block;
+background:#00ccff;
+padding:15px 25px;
+border-radius:15px;
+margin-top:20px;
+cursor:pointer;
+}
+
+input{
+display:none;
+}
+
+/* loading */
+.loader{
+display:none;
+margin:25px auto;
+border:8px solid #222;
+border-top:8px solid cyan;
+border-radius:50%;
+width:70px;
+height:70px;
+animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+100%{transform:rotate(360deg);}
+}
+
+#done{
+display:none;
+font-size:30px;
+color:#00ff88;
+margin-top:20px;
+}
+
+.close{
+margin-top:20px;
+background:#ff4444;
+}
 </style>
 </head>
-
 <body>
 
-<div class="topbar">
 <div id="rainbowText">
 Loading...
 </div>
+
+<button onclick="openMenu()">
+DPI
+</button>
+
+
+<div class="menu" id="menu">
+<h2>DPI Buff Màn Across</h2>
+
+<label class="fileBtn">
+📂 CHỌN FILE TỪ TỆP
+<input type="file" onchange="startLoad()">
+</label>
+
+<div class="loader" id="loader"></div>
+
+<div id="done">
+✓ Thành Công
 </div>
+
+<button class="close" onclick="closeMenu()">
+Đóng
+</button>
+
+</div>
+
 
 <script>
 let batteryLevel="--";
@@ -57,18 +140,17 @@ let batteryLevel="--";
 if(navigator.getBattery){
 navigator.getBattery().then(function(battery){
 
-function updateBattery(){
+function upBattery(){
 batteryLevel=
 Math.floor(
 battery.level*100
 )+"%";
 }
-
-updateBattery();
+upBattery();
 
 battery.addEventListener(
 "levelchange",
-updateBattery
+upBattery
 );
 
 });
@@ -78,23 +160,43 @@ function updateLine(){
 
 let d=new Date();
 
-let text=
-"⚙ DPI ACROSS | " +
-d.toLocaleDateString() +
-" | " +
-d.toLocaleTimeString() +
-" | 🔋 " +
-batteryLevel;
-
 document.getElementById(
 "rainbowText"
-).innerHTML=text;
+).innerHTML=
+"⚙ DPI ACROSS | "+
+d.toLocaleDateString()+
+" | "+
+d.toLocaleTimeString()+
+" | 🔋 "+
+batteryLevel;
 
 }
 
 setInterval(updateLine,1000);
 updateLine();
 
+
+function openMenu(){
+menu.style.display="block";
+}
+
+function closeMenu(){
+menu.style.display="none";
+loader.style.display="none";
+done.style.display="none";
+}
+
+function startLoad(){
+
+done.style.display="none";
+loader.style.display="block";
+
+setTimeout(function(){
+loader.style.display="none";
+done.style.display="block";
+},3000);
+
+}
 </script>
 
 </body>
