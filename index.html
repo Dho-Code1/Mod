@@ -13,7 +13,6 @@ text-align:center;
 padding-top:70px;
 }
 
-/* dòng chữ duy nhất */
 #rainbowText{
 font-size:34px;
 font-weight:bold;
@@ -42,7 +41,6 @@ border-radius:20px;
 cursor:pointer;
 }
 
-/* menu */
 .menu{
 display:none;
 position:fixed;
@@ -50,14 +48,10 @@ top:50%;
 left:50%;
 transform:translate(-50%,-50%);
 background:#111827;
-width:360px;
+width:370px;
 border-radius:25px;
 padding:30px;
 color:white;
-}
-
-.menu h2{
-margin-top:0;
 }
 
 .fileBtn{
@@ -73,7 +67,50 @@ input{
 display:none;
 }
 
-/* loading */
+.toggleBox{
+margin-top:25px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+font-size:26px;
+}
+
+.switch{
+width:65px;
+height:34px;
+background:#333;
+border-radius:40px;
+position:relative;
+cursor:pointer;
+}
+
+.switch:before{
+content:'';
+width:28px;
+height:28px;
+background:white;
+border-radius:50%;
+position:absolute;
+top:3px;
+left:4px;
+transition:.3s;
+}
+
+.switch.active{
+background:#00ff88;
+}
+
+.switch.active:before{
+left:33px;
+}
+
+#headStatus{
+margin-top:15px;
+font-size:24px;
+color:#00ff88;
+display:none;
+}
+
 .loader{
 display:none;
 margin:25px auto;
@@ -116,6 +153,15 @@ DPI
 <div class="menu" id="menu">
 <h2>DPI Buff Màn Across</h2>
 
+<div class="toggleBox">
+<span>🎯 Bám Đầu</span>
+<div class="switch" onclick="toggleHead(this)"></div>
+</div>
+
+<div id="headStatus">
+Headlock ON ✓
+</div>
+
 <label class="fileBtn">
 📂 CHỌN FILE TỪ TỆP
 <input type="file" onchange="startLoad()">
@@ -133,48 +179,37 @@ DPI
 
 </div>
 
-
 <script>
 let batteryLevel="--";
 
 if(navigator.getBattery){
 navigator.getBattery().then(function(battery){
-
 function upBattery(){
-batteryLevel=
-Math.floor(
+batteryLevel=Math.floor(
 battery.level*100
 )+"%";
 }
 upBattery();
-
 battery.addEventListener(
-"levelchange",
-upBattery
+"levelchange",upBattery
 );
-
 });
 }
 
 function updateLine(){
-
 let d=new Date();
 
-document.getElementById(
-"rainbowText"
-).innerHTML=
+rainbowText.innerHTML=
 "⚙ DPI ACROSS | "+
 d.toLocaleDateString()+
 " | "+
 d.toLocaleTimeString()+
 " | 🔋 "+
 batteryLevel;
-
 }
 
 setInterval(updateLine,1000);
 updateLine();
-
 
 function openMenu(){
 menu.style.display="block";
@@ -184,6 +219,16 @@ function closeMenu(){
 menu.style.display="none";
 loader.style.display="none";
 done.style.display="none";
+}
+
+function toggleHead(x){
+x.classList.toggle("active");
+
+if(x.classList.contains("active")){
+headStatus.style.display="block";
+}else{
+headStatus.style.display="none";
+}
 }
 
 function startLoad(){
