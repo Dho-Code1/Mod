@@ -1,265 +1,107 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-<meta charset="UTF-8">
-<title>DPI ACROSS</title>
-
-<style>
-body{
-margin:0;
-background:#060611;
-font-family:Arial;
-text-align:center;
-padding-top:70px;
-overflow:hidden;
-}
-
-#rainbowText{
-font-size:34px;
-font-weight:bold;
-animation:rainbow 4s linear infinite;
-}
-
-@keyframes rainbow{
-0%{color:red;}
-14%{color:orange;}
-28%{color:yellow;}
-42%{color:lime;}
-57%{color:cyan;}
-71%{color:blue;}
-85%{color:violet;}
-100%{color:red;}
-}
-
-/* Assistive Touch */
-#homeBtn{
-position:fixed;
-right:30px;
-bottom:120px;
-width:70px;
-height:70px;
-border-radius:50%;
-background:rgba(255,255,255,.25);
-backdrop-filter:blur(8px);
-border:3px solid white;
-box-shadow:0 0 15px cyan;
-display:flex;
-justify-content:center;
-align-items:center;
-font-size:34px;
-cursor:pointer;
-}
-
-/* menu */
-.menu{
-display:none;
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-background:#111827;
-width:360px;
-border-radius:25px;
-padding:30px;
-color:white;
-}
-
-.fileBtn{
-display:inline-block;
-background:#00ccff;
-padding:18px 28px;
-border-radius:16px;
-margin-top:30px;
-font-size:24px;
-cursor:pointer;
-}
-
-input{
-display:none;
-}
-
-.loader{
-display:none;
-margin:30px auto;
-border:8px solid #222;
-border-top:8px solid cyan;
-border-radius:50%;
-width:70px;
-height:70px;
-animation:spin 1s linear infinite;
-}
-
-@keyframes spin{
-100%{transform:rotate(360deg);}
-}
-
-#done{
-display:none;
-font-size:30px;
-color:#00ff88;
-margin-top:20px;
-}
-
-.close{
-margin-top:20px;
-background:#ff4444;
-border:none;
-padding:15px 40px;
-font-size:24px;
-border-radius:16px;
-color:white;
-}
-
-/* popup lưu ý */
-.notice{
-display:none;
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-background:#151525;
-width:380px;
-padding:30px;
-border-radius:25px;
-box-shadow:0 0 30px gold;
-color:white;
-}
-
-.notice h2{
-color:gold;
-}
-
-.notice button{
-margin-top:20px;
-background:#00cc88;
-border:none;
-padding:12px 35px;
-border-radius:15px;
-font-size:22px;
-}
-</style>
+    <meta charset="UTF-8">
+    <title>So sánh và Chỉnh sửa Hex File</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f9; }
+        h2 { color: #333; }
+        .upload-container { display: flex; gap: 20px; margin-bottom: 20px; }
+        .box { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex: 1; }
+        textarea { width: 100%; height: 200px; font-family: monospace; font-size: 14px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .diff-container { display: flex; gap: 20px; margin-top: 20px; }
+        .diff-box { flex: 1; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        pre { font-family: monospace; white-space: pre-wrap; word-break: break-all; height: 300px; overflow-y: scroll; background: #fafafa; padding: 10px; border: 1px solid #eee; }
+        .highlight { background-color: #ffcccc; font-weight: bold; }
+        button { background: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #0056b3; }
+    </style>
 </head>
 <body>
 
-<div id="rainbowText">
-Loading...
-</div>
+    <h2>Công cụ So sánh và Chỉnh sửa Hex</h2>
+    
+    <div class="upload-container">
+        <div class="box">
+            <h3>File Gốc 1</h3>
+            <input type="file" id="file1" onchange="loadFile(1)">
+            <textarea id="text1" placeholder="Hoặc dán chuỗi hex gốc vào đây..." oninput="compareHex()"></textarea>
+        </div>
+        <div class="box">
+            <h3>File Cần So Sánh 2</h3>
+            <input type="file" id="file2" onchange="loadFile(2)">
+            <textarea id="text2" placeholder="Hoặc dán chuỗi hex mới vào đây..." oninput="compareHex()"></textarea>
+        </div>
+    </div>
 
-<!-- Menu -->
-<div id="homeBtn" onclick="openMenu()">
-◉
-</div>
+    <button onclick="compareHex()">So Sánh Ngay</button>
 
-
-<div class="menu" id="menu">
-
-<h2>DPI Across</h2>
-
-<label class="fileBtn">
-📂 CHỌN FILE DPI Được cấp 
-<input type="file" onchange="startLoad()">
-</label>
-
-<div class="loader" id="loader"></div>
-
-<div id="done">
-✓ Thành Công
-</div>
-
-<br>
-
-<button class="close" onclick="closeMenu()">
-Đóng
-</button>
-
-</div>
-
-
-<div class="notice" id="notice">
-<h2>⚠ LƯU Ý</h2>
-
-<p style="font-size:24px">
-Khi cài DPI xong yêu cầu bạn<br>
-<b>turn off the phone trong 10p</b><br>
-và reboot.
-</p>
-
-<button onclick="closeNotice()">
-OK
-</button>
-
-</div>
-
+    <div class="diff-container">
+        <div class="diff-box">
+            <h3>Kết quả File 1 (Có thể sửa trực tiếp bên trên)</h3>
+            <div id="result1"></div>
+        </div>
+        <div class="diff-box">
+            <h3>Kết quả File 2 & Tải về</h3>
+            <div id="result2"></div>
+            <button onclick="downloadFile()">Tải Về File 2 Đã Sửa</button>
+        </div>
+    </div>
 
 <script>
-let batteryLevel="--";
+    function loadFile(fileNum) {
+        const fileInput = document.getElementById('file' + fileNum);
+        const file = fileInput.files[0];
+        if (!file) return;
 
-if(navigator.getBattery){
-navigator.getBattery().then(function(battery){
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const arrayBuffer = e.target.result;
+            const bytes = new Uint8Array(arrayBuffer);
+            let hexString = '';
+            for (let i = 0; i < bytes.length; i++) {
+                hexString += bytes[i].toString(16).padStart(2, '0').toUpperCase() + ' ';
+            }
+            document.getElementById('text' + fileNum).value = hexString.trim();
+            compareHex();
+        };
+        reader.readAsArrayBuffer(file);
+    }
 
-function upBattery(){
-batteryLevel=
-Math.floor(
-battery.level*100
-)+"%";
-}
+    function compareHex() {
+        const val1 = document.getElementById('text1').value.trim().split(/\s+/);
+        const val2 = document.getElementById('text2').value.trim().split(/\s+/);
+        
+        let res1 = '', res2 = '';
+        const maxLength = Math.max(val1.length, val2.length);
 
-upBattery();
-battery.addEventListener(
-"levelchange",
-upBattery
-);
+        for (let i = 0; i < maxLength; i++) {
+            let b1 = val1[i] || '';
+            let b2 = val2[i] || '';
 
-});
-}
+            if (b1 !== b2) {
+                res1 += `<span class="highlight">${b1}</span> `;
+                res2 += `<span class="highlight">${b2}</span> `;
+            } else {
+                res1 += b1 + ' ';
+                res2 += b2 + ' ';
+            }
+        }
 
-function updateLine(){
+        document.getElementById('result1').innerHTML = `<pre>${res1}</pre>`;
+        document.getElementById('result2').innerHTML = `<pre>${res2}</pre>`;
+    }
 
-let d=new Date();
-
-rainbowText.innerHTML=
-" DPI ACROSS🧸 | "+
-d.toLocaleDateString()+
-" | "+
-d.toLocaleTimeString()+
-" | 🔋 "+
-batteryLevel;
-
-}
-
-setInterval(updateLine,1000);
-updateLine();
-
-
-function openMenu(){
-menu.style.display="block";
-}
-
-function closeMenu(){
-menu.style.display="none";
-}
-
-function startLoad(){
-
-done.style.display="none";
-loader.style.display="block";
-
-setTimeout(function(){
-
-loader.style.display="none";
-done.style.display="block";
-
-setTimeout(function(){
-notice.style.display="block";
-},1200);
-
-},3000);
-
-}
-
-function closeNotice(){
-notice.style.display="none";
-}
+    function downloadFile() {
+        const textVal = document.getElementById('text2').value.trim().split(/\s+/);
+        const byteArray = new Uint8Array(textVal.map(byte => parseInt(byte, 16) || 0));
+        
+        const blob = new Blob([byteArray]);
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'edited_file.bin';
+        link.click();
+    }
 </script>
 
 </body>
