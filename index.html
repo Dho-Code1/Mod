@@ -8,11 +8,23 @@
         h2 { color: #333; }
         .upload-container { display: flex; gap: 20px; margin-bottom: 20px; }
         .box { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex: 1; }
-        textarea { width: 100%; height: 200px; font-family: monospace; font-size: 14px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        textarea { width: 100%; height: 250px; font-family: monospace; font-size: 14px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; resize: vertical; }
         .diff-container { display: flex; gap: 20px; margin-top: 20px; }
-        .diff-box { flex: 1; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        pre { font-family: monospace; white-space: pre-wrap; word-break: break-all; height: 300px; overflow-y: scroll; background: #fafafa; padding: 10px; border: 1px solid #eee; }
-        .highlight { background-color: #ffcccc; font-weight: bold; }
+        .diff-box { flex: 1; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative; }
+        
+        /* Khung chứa hiệu ứng tô màu phía sau và textarea chỉnh sửa phía trên */
+        .editor-wrapper { position: relative; height: 250px; border: 1px solid #ccc; border-radius: 4px; background: #fafafa; }
+        .backdrop, .editable-textarea {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 10px; font-family: monospace; font-size: 14px; line-height: 1.5;
+            box-sizing: border-box; white-space: pre-wrap; word-break: break-all; overflow-y: auto;
+        }
+        .backdrop { color: transparent; pointer-events: none; }
+        .editable-textarea {
+            background: transparent; color: #333; border: none; outline: none; resize: none;
+        }
+        .highlight { background-color: #ffcccc; color: #d00; font-weight: bold; }
+        
         button { background: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; margin-top: 10px; }
         button:hover { background: #0056b3; }
     </style>
@@ -23,27 +35,29 @@
     
     <div class="upload-container">
         <div class="box">
-            <h3>File Gốc 1</h3>
+            <h3>Tải lên File Gốc 1</h3>
             <input type="file" id="file1" onchange="loadFile(1)">
-            <textarea id="text1" placeholder="Hoặc dán chuỗi hex gốc vào đây..." oninput="compareHex()"></textarea>
         </div>
         <div class="box">
-            <h3>File Cần So Sánh 2</h3>
+            <h3>Tải lên File Cần Sửa 2</h3>
             <input type="file" id="file2" onchange="loadFile(2)">
-            <textarea id="text2" placeholder="Hoặc dán chuỗi hex mới vào đây..." oninput="compareHex()"></textarea>
         </div>
     </div>
 
-    <button onclick="compareHex()">So Sánh Ngay</button>
-
     <div class="diff-container">
         <div class="diff-box">
-            <h3>Kết quả File 1 (Có thể sửa trực tiếp bên trên)</h3>
-            <div id="result1"></div>
+            <h3>File 1 (Chỉ xem)</h3>
+            <div class="editor-wrapper">
+                <div id="backdrop1" class="backdrop"></div>
+                <textarea id="text1" class="editable-textarea" oninput="compareHex()" placeholder="Hoặc dán chuỗi hex vào đây..."></textarea>
+            </div>
         </div>
         <div class="diff-box">
-            <h3>Kết quả File 2 & Tải về</h3>
-            <div id="result2"></div>
+            <h3>File 2 (Bạn có thể chỉnh sửa trực tiếp ở đây)</h3>
+            <div class="editor-wrapper">
+                <div id="backdrop2" class="backdrop"></div>
+                <textarea id="text2" class="editable-textarea" oninput="compareHex()" placeholder="Hoặc dán chuỗi hex vào đây..."></textarea>
+            </div>
             <button onclick="downloadFile()">Tải Về File 2 Đã Sửa</button>
         </div>
     </div>
@@ -80,17 +94,31 @@
             let b2 = val2[i] || '';
 
             if (b1 !== b2) {
-                res1 += `<span class="highlight">${b1}</span> `;
-                res2 += `<span class="highlight">${b2}</span> `;
+                res1 += `<span class="highlight">${escapeHtml(b1)}</span> `;
+                res2 += `<span class="highlight">${escapeHtml(b2)}</span> `;
             } else {
-                res1 += b1 + ' ';
-                res2 += b2 + ' ';
+                res1 += escapeHtml(b1) + ' ';
+                res2 += escapeHtml(b2) + ' ';
             }
         }
 
-        document.getElementById('result1').innerHTML = `<pre>${res1}</pre>`;
-        document.getElementById('result2').innerHTML = `<pre>${res2}</pre>`;
+        document.getElementById('backdrop1').innerHTML = res1 + ' ';
+        document.getElementById('backdrop2').innerHTML = res2 + ' ';
     }
+
+    function escapeHtml(text) {
+        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Đồng bộ cuộn chuột giữa textarea và lớp nền màu đỏ
+    ['1', '2'].forEach(id => {
+        const ta = document.getElementById('text' + id);
+        const bd = document.getElementById('backdrop' + id);
+        ta.addEventListener('scroll', () => {
+            bd.scrollTop = ta.scrollTop;
+            bd.scrollLeft = ta.scrollLeft;
+        });
+    });
 
     function downloadFile() {
         const textVal = document.getElementById('text2').value.trim().split(/\s+/);
